@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import {
   Mail, Lock, Eye, EyeOff, Search, ArrowRight,
   AlertCircle, CheckCircle
@@ -103,6 +104,15 @@ export default function LoginPage() {
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }))
   }
 
+  const navigate = useNavigate()
+  const { login, isAuthenticated } = useAuth()
+
+  useEffect(() => {
+    if (isAuthenticated && !success) {
+      navigate('/dashboard', { replace: true })
+    }
+  }, [isAuthenticated, success, navigate])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     const validationErrors = validate(form)
@@ -112,23 +122,17 @@ export default function LoginPage() {
     }
 
     setLoading(true)
-    // ──────────────────────────────────────────────────
-    // 🔗 BACKEND INTEGRATION POINT
-    // Replace the setTimeout below with your actual API call:
-    //
-    //   const res = await fetch('/api/auth/login', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ email: form.email, password: form.password }),
-    //   })
-    //   const data = await res.json()
-    //   if (!res.ok) { setErrors({ form: data.message }); return }
-    //   localStorage.setItem('token', data.token)
-    //   navigate('/dashboard')
-    // ──────────────────────────────────────────────────
-    await new Promise(r => setTimeout(r, 1500)) // Simulated delay
-    setLoading(false)
-    setSuccess(true)
+    try {
+      await login({ email: form.email.trim(), password: form.password })
+      setLoading(false)
+      setSuccess(true)
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 600)
+    } catch (err) {
+      setLoading(false)
+      setErrors({ form: err.message || 'Login failed. Please check your credentials.' })
+    }
   }
 
   const handleGoogleLogin = () => {
@@ -257,6 +261,13 @@ export default function LoginPage() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
+              {errors.form && (
+                <div className="flex items-center gap-2 p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                  <span>{errors.form}</span>
+                </div>
+              )}
+
               <FormField
                 id="email"
                 label="College Email Address"
@@ -345,7 +356,7 @@ export default function LoginPage() {
             {/* Sign up link */}
             <p className="text-center text-sm text-slate-500">
               Don't have an account?{' '}
-              <Link to="/login" className="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors">
+              <Link to="/signup" className="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors">
                 Sign Up — it's free
               </Link>
             </p>

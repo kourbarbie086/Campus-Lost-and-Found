@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Search } from 'lucide-react'
+import { Menu, X, Search, LogOut, User } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
 const NAV_LINKS = [
-  { label: 'Home',        href: '/#home' },
+  { label: 'Home',         href: '/#home'       },
+  { label: 'Browse Items', href: '/items'       },
   { label: 'How It Works', href: '/#how-it-works' },
-  { label: 'About',       href: '/#about' },
+  { label: 'About',        href: '/#about'      },
+  { label: 'Report Item',  href: '/report'      },
 ]
 
 export default function Navbar() {
   const [isScrolled,     setIsScrolled]     = useState(false)
   const [isMobileOpen,   setIsMobileOpen]   = useState(false)
   const location = useLocation()
+  const { user, isAuthenticated, logout } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
@@ -58,18 +62,48 @@ export default function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              to="/login"
-              className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-indigo-600 transition-colors duration-200"
-            >
-              Login
-            </Link>
-            <Link
-              to="/login"
-              className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md hover:shadow-indigo-200 transition-all duration-300 hover:-translate-y-0.5"
-            >
-              Sign Up
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-indigo-600 transition-colors duration-200"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:border-indigo-300 text-sm font-medium transition-all"
+                >
+                  <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-violet-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    {user?.firstname?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <span>{user?.firstname || 'Profile'}</span>
+                </Link>
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-slate-500 hover:text-rose-600 transition-colors"
+                  title="Log out"
+                >
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-indigo-600 transition-colors duration-200"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md hover:shadow-indigo-200 transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Hamburger */}
@@ -99,18 +133,43 @@ export default function Navbar() {
               </a>
             ))}
             <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-              <Link
-                to="/login"
-                className="block px-4 py-3 text-center text-sm font-medium text-slate-700 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all"
-              >
-                Login
-              </Link>
-              <Link
-                to="/login"
-                className="block px-4 py-3 text-center text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all"
-              >
-                Sign Up
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="block px-4 py-3 text-center text-sm font-medium text-slate-700 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-3 text-center text-sm font-medium text-slate-700 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all"
+                  >
+                    Profile ({user?.firstname})
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="w-full px-4 py-3 text-center text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block px-4 py-3 text-center text-sm font-medium text-slate-700 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="block px-4 py-3 text-center text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -17,8 +17,22 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 *.sw?
+
+# Environment variables & sensitive files
+.env
+.env.*
+.env.development
+.env.test
+.env.production
+.env.local
+*.env
+ref_repo/**/.env*
+ref_repo/**/access.log
+
+# Reference repository (cloned external repo)
+ref_repo/
+
+# Uploaded media
+public/uploads/*
+!public/uploads/.gitkeep

@@ -6,7 +6,7 @@ const QUICK_LINKS = [
   { label: 'How It Works', href: '/#how-it-works' },
   { label: 'About',        href: '/#about' },
   { label: 'Login',        href: '/login' },
-  { label: 'Sign Up',      href: '/login' },
+  { label: 'Sign Up',      href: '/signup' },
 ]
 
 const LEGAL_LINKS = [
